@@ -1,78 +1,74 @@
-# Script by Alex W
-# Thanks to PJ for the lambda functions
+# Original credit to Alex W and PJ
+import os
 
-gb2hex = lambda gb: gb >> 2 & ~0x3FFF | gb & 0x3FFF
-hex2gb = lambda hex: hex << 2 & ~0xFFFF | hex & 0x3FFF | 0x4000
-romRead = lambda n: sum([ord(rom.read(1)) << i*8 for i in range(n)])
-readLongPointer = lambda: (romRead(1) << 16) | romRead(2)
+file_path = "./SRC/maps/enemyData.asm"
 
-rom = open("../Metroid2.gb", "rb")
-enemyPointersBegin = gb2hex(0x0342E0)
-enemyDataBegin = gb2hex(0x0350E0)
-end = gb2hex(0x036244)
+gb2rom = lambda gb_bank, gb_address: (gb_bank * 0x4000) + (gb_address & 0x3fff)
 
-#Read enemy pointers and give each a name
-enemyPointers = []
-rom.seek(enemyPointersBegin)
-bank = 9
-x = 0
-y = 0
-while rom.tell() < enemyDataBegin:
-    temp = gb2hex(0x030000+romRead(2))
-    enemyPointers.append( (temp, "enemyBank{:X}_{:X}{:X}".format(bank,y,x), bank) )
-    x += 1
-    if x == 0x10:
-        x = 0
-        y += 1
-        if y == 0x10:
-            y = 0
-            bank += 1
 
-#Write the enemyPointerTable with label names
-i = 0
-bank = 9
-lastBank = 0
-for d in enemyPointers:
-    bank = d[2]
-    if(bank != lastBank):
-        print("\n\n; Enemy Data Pointers for Bank {:X}".format(bank), end="")
-        
-    if(i%16 == 0):
-        print("\n    dw ", end="")
-    else:
-        print(", ", end="")
-        
-    lastBank = bank
-    print(d[1], end="")
-    i += 1
-print("\n")    
-
-# Read the enemy data
-print("\n\n; Enemy Data for Banks 9-F")
-rom.seek(enemyDataBegin)
-enemy = 0
-while rom.tell() < end:
-
-    for d in enemyPointers:
-        if rom.tell() == d[0]:
-            print(d[1]+": db ", end="")
+def extract():
+    rom = open("./Metroid2.gb", "rb")
+    rom_read = lambda n: int.from_bytes(rom.read(n), byteorder='little')
+    enemy_pointers_begin = gb2rom(0x3,0x42E0)
+    enemy_data_begin = gb2rom(0x3,0x50E0)
+    enemy_end = gb2rom(0x3,0x6244)
+    file_content = ""
     
-    number = romRead(1)
-    while number != 0xFF:
-        print("${:02X},".format(number), end="")
+    #Read enemy pointers and give each a name
+    enemy_pointers = {}
+    enemy_pointers_bank = []
+    rom.seek(enemy_pointers_begin)
+    bank = 9
+    x = 0
+    y = 0
+    while rom.tell() < enemy_data_begin:
+        temp = gb2rom(0x3,rom_read(2))
+        enemy_pointers_bank.append([temp, "enemyBank{:X}_{:X}{:X}".format(bank,y,x)])
+        x += 1
+        if x == 0x10:
+            x = 0
+            y += 1
+            if y == 0x10:
+                y = 0
+                enemy_pointers[bank] = enemy_pointers_bank
+                enemy_pointers_bank = []
+                bank += 1
+    
+    #Write the enemyPointerTable with label names
+    for bank, enemy_pointers_bank in enemy_pointers.items():
+        file_content += f"; Enemy Data Pointers for Bank {bank:X}\n"
+        for row in [enemy_pointers_bank[i:i+16] for i in range(0, len(enemy_pointers_bank), 16)]:
+            file_content += "    dw " + ", ".join([d[1] for d in row]) + "\n"
+        file_content += "\n"
+
+    # Read the enemy data
+    enemy_pointers = [d for enemy_pointers_bank in enemy_pointers.values() for d in enemy_pointers_bank]
+    enemy_pointers.sort(key=lambda ptr: ptr[0])
+    enemy_pointers.append([-1, ""])
+    
+    file_content += "\n\n; Enemy Data for Banks 9-F\n; <spawn number>, <sprite type>, <X>, <Y>\n"
+    rom.seek(enemy_data_begin)
+    while rom.tell() < enemy_end:
+        if rom.tell() == enemy_pointers[0][0]:
+            file_content += "\n"
+            while rom.tell() == enemy_pointers[0][0]:
+                ptr = enemy_pointers.pop(0)
+                file_content += ptr[1] + ":\n"
         
-        type = romRead(1)
-        print("${:02X},".format(type), end="")
-        
-        xPos = romRead(1)
-        print("${:02X},".format(xPos), end="")
-        
-        yPos = romRead(1)
-        print("${:02X}, ".format(yPos), end="")
-        
-        number = romRead(1)
-        
-    print("$FF")
-    enemy += 1
+        byte1 = rom_read(1)
+        line = f"    db ${byte1:02X}"
+        if byte1 != 0xFF:
+            byte2 = rom_read(1)
+            byte3 = rom_read(1)
+            byte4 = rom_read(1)
+            line += f", ${byte2:02X}, ${byte3:02X}, ${byte4:02X}"
+        file_content += line + "\n"
+    
+    with open(file_path, "w") as f:
+        f.write(file_content)
+
+def clean():
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 # EoF

@@ -1,36 +1,53 @@
-# Script by Alex W
-# Thanks to PJ for the lambda functions
+# Original credit to Alex W and PJ
+import os
 
-gb2hex = lambda gb: gb >> 2 & ~0x3FFF | gb & 0x3FFF
-hex2gb = lambda hex: hex << 2 & ~0xFFFF | hex & 0x3FFF | 0x4000
-romRead = lambda n: sum([ord(rom.read(1)) << i*8 for i in range(n)])
-readLongPointer = lambda: (romRead(1) << 16) | romRead(2)
+file_path = "./SRC/data/credits.asm"
 
-rom = open("../Metroid2.gb", "rb")
-creditsBegin = gb2hex(0x067920)
+def parse_credits_line(line_data):
+    for i in range(len(line_data)):
+        if line_data[i] == 0x5E: # Dashes aren't ^s
+            line_data[i] = "-"
+        elif line_data[i] == 0x1B: # Colon for time
+            line_data[i] = ":"
+        elif line_data[i] > 0x20 and line_data[i] < 0x30: # For the "The End" tilemap
+            pass
+        else:
+            line_data[i] = bytearray([line_data[i]]).decode()
+    
+    for i in range(len(line_data)-1, 0, -1):
+        if type(line_data[i-1]) is str and type(line_data[i]) is str:
+            line_data[i-1] += line_data.pop(i)
+    
+    for i in range(len(line_data)):
+        if type(line_data[i]) is str:
+            line_data[i] = '"' + line_data[i] + '"'
+        else:
+            line_data[i] = f"${line_data[i]:02X}"
+    
+    return '    db ' + ",".join(line_data) + "\n"
 
-rom.seek(creditsBegin)
-temp = romRead(1)
+def extract():
+    rom = open("./Metroid2.gb", "rb")
+    credits_begin = (0x6 * 0x4000) + (0x7920 & 0x3fff)
+    rom.seek(credits_begin)
+    
+    file_content = "; Credits text - 06:7920\nSETCHARMAP creditsText\n\n"
+    temp = rom.read(1)[0]
+    while temp != 0xF0:
+        if temp == 0xF1: # Newline
+            file_content += '    db "\\n"\n'
+        else:
+            rom.seek(rom.tell()-1) # Undo the previous read (because we don't have goto)
+            file_content += parse_credits_line(list(rom.read(20)))
+        temp = rom.read(1)[0]
+    rom.close()
+    file_content += '    db "<END>"'
+    
+    with open(file_path, "w") as f:
+        f.write(file_content)
 
-print("    db \"", end="")
-while temp != 0xF0:
-    if temp == 0xF1: # Newline
-        print("\\n\"\n    db \"", end="")
-    elif temp == 0x5E: # Dashes aren't ^s
-        print("-", end="")
-    elif temp == 0x1B: # Colon for time
-        print(":", end="")
-    elif (temp > 0x20) & (temp < 0x30): # For the "The End" tilemap
-        print("\",", end="")
-        while (temp > 0x20) & (temp < 0x30):
-            print("${:02X},".format(temp), end="")
-            temp = romRead(1)
-        print("\"", end="")
-        rom.seek(rom.tell()-1) # Undo the previous read (because we don't have goto)
-    else:
-        print(bytearray.fromhex("{:X}".format(temp)).decode(), end="")
-	
-    temp = romRead(1)
-	
-print("<END>\"")
+def clean():
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
+# EoF

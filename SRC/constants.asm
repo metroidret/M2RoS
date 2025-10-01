@@ -78,4 +78,43 @@ def blockType_save  = 7 ;Save pillar
 include "samus/samus_poseConstants.asm"
 
 
+; charmaps
+PUSHC
+
+NEWCHARMAP creditsText
+CHARMAP "<END>", $F0
+CHARMAP "\n", $F1
+CHARMAP "-", $5E
+CHARMAP ":", $1B
+
+; Standard ASCII characters
+CHARMAP " ", $20
+CHARMAP "A", $41
+CHARMAP "B", $42
+CHARMAP "C", $43
+CHARMAP "D", $44
+CHARMAP "E", $45
+CHARMAP "F", $46
+CHARMAP "G", $47
+CHARMAP "H", $48
+CHARMAP "I", $49
+CHARMAP "J", $4A
+CHARMAP "K", $4B
+CHARMAP "L", $4C
+CHARMAP "M", $4D
+CHARMAP "N", $4E
+CHARMAP "O", $4F
+CHARMAP "P", $50
+CHARMAP "Q", $51
+CHARMAP "R", $52
+CHARMAP "S", $53
+CHARMAP "T", $54
+CHARMAP "U", $55
+CHARMAP "V", $56
+CHARMAP "W", $57
+CHARMAP "X", $58
+CHARMAP "Y", $59
+CHARMAP "Z", $5A
+
+POPC
 

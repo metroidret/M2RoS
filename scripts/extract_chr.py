@@ -1,75 +1,81 @@
-# Script by Alex W
-# Thanks to PJ for the lambda functions
+# Original credit to Alex W and PJ
 
 # Tool for extracting chr data into a binary file
 
-gb2hex = lambda gb: gb >> 2 & ~0x3FFF | gb & 0x3FFF
-hex2gb = lambda hex: hex << 2 & ~0xFFFF | hex & 0x3FFF | 0x4000
-romRead = lambda n: sum([ord(rom.read(1)) << i*8 for i in range(n)])
-readLongPointer = lambda: (romRead(1) << 16) | romRead(2)
+import os
 
-def write_chr(entry):
-    rom.seek(gb2hex(entry[0]))
-    chr = rom.read(entry[2])
-    with open("../out/chr/"+entry[1]+".chr", "wb") as f:
-        f.write(chr)
+
+class GfxEntry:
+    def __init__(self, gb_bank, gb_address, size, path):
+        self.rom_address = (gb_bank * 0x4000) + (gb_address & 0x3fff)
+        self.size = size
+        self.path = "./SRC/" + path + ".chr"
 
 gfx_list = [
-            [0x055f34, "titleScreen"    ,0xA00],
-            [0x056934, "creditsFont"    ,0x300],
-            [0x056c34, "itemFont"       ,0x200],
-            [0x056e34, "creditsNumbers" ,0x100],
-            [0x056f34, "creditsSprTiles",0xF00],
-            [0x057e34, "theEnd"         ,0x100],
-            
-            [0x064000, "cannonBeam"          ,0x20 ],
-            [0x064020, "cannonMissile"       ,0x20 ],
-            [0x064040, "beamIce"             ,0x20 ],
-            [0x064060, "beamWave"            ,0x20 ],
-            [0x064080, "beamSpazerPlasma"    ,0x20 ],
-            [0x0640a0, "spinSpaceTop"        ,0x70 ],
-            [0x064110, "spinSpaceBottom"     ,0x50 ],
-            [0x064160, "spinScrewTop"        ,0x70 ],
-            [0x0641d0, "spinScrewBottom"     ,0x50 ],
-            [0x064220, "spinSpaceScrewTop"   ,0x70 ],
-            [0x064290, "spinSpaceScrewBottom",0x50 ],
-            [0x0642e0, "springBallTop"       ,0x20 ],
-            [0x064300, "springBallBottom"    ,0x20 ],
-            [0x064320, "samusPowerSuit"      ,0xB00],
-            [0x064e20, "samusVariaSuit"      ,0xB00],
-            [0x065920, "enemiesA"            ,0x400],
-            [0x065d20, "enemiesB"            ,0x400],
-            [0x066120, "enemiesC"            ,0x400],
-            [0x066520, "enemiesD"            ,0x400],
-            [0x066920, "enemiesE"            ,0x400],
-            [0x066d20, "enemiesF"            ,0x400],
-            [0x067120, "arachnus"            ,0x400],
-            [0x067520, "surfaceSPR"          ,0x400],
-            
-            [0x074000, "plantBubbles", 0x800],
-            [0x074800, "ruinsInside",  0x800],
-            [0x075000, "queenBG",      0x800],
-            [0x075800, "caveFirst",    0x800],
-            [0x076000, "surfaceBG",    0x800],
-            [0x076800, "lavaCavesA",   0x530],
-            [0x076d30, "lavaCavesB",   0x530],
-            [0x077260, "lavaCavesC",   0x530],
-            [0x077790, "items",        0x2C0  ],
-            [0x077a50, "itemOrb",      0x40   ],
-            [0x077a90, "commonItems",  0x100  ],
-            
-            [0x0859bc, "metAlpha", 0x400],
-            [0x085dbc, "metGamma", 0x400],
-            [0x0861bc, "metZeta",  0x400],
-            [0x0865bc, "metOmega", 0x400],
-            [0x0869bc, "ruinsExt", 0x800],
-            [0x0871bc, "finalLab", 0x800],
-            [0x0879bc, "queenSPR", 0x500],
-           ]
+    GfxEntry(0x5,0x5f34, 0xA00, "gfx/titleCredits/titleScreen"),
+    GfxEntry(0x5,0x6934, 0x300, "gfx/titleCredits/creditsFont"),
+    GfxEntry(0x5,0x6c34, 0x200, "gfx/titleCredits/itemFont"),
+    GfxEntry(0x5,0x6e34, 0x100, "gfx/titleCredits/creditsNumbers"),
+    GfxEntry(0x5,0x6f34, 0xF00, "gfx/titleCredits/creditsSprTiles"),
+    GfxEntry(0x5,0x7e34, 0x100, "gfx/titleCredits/theEnd"),
 
-rom = open("../Metroid2.gb", "rb")
+    GfxEntry(0x6,0x4000,  0x20, "gfx/samus/cannonBeam"),
+    GfxEntry(0x6,0x4020,  0x20, "gfx/samus/cannonMissile"),
+    GfxEntry(0x6,0x4040,  0x20, "gfx/samus/beamIce"),
+    GfxEntry(0x6,0x4060,  0x20, "gfx/samus/beamWave"),
+    GfxEntry(0x6,0x4080,  0x20, "gfx/samus/beamSpazerPlasma"),
+    GfxEntry(0x6,0x40a0,  0x70, "gfx/samus/spinSpaceTop"),
+    GfxEntry(0x6,0x4110,  0x50, "gfx/samus/spinSpaceBottom"),
+    GfxEntry(0x6,0x4160,  0x70, "gfx/samus/spinScrewTop"),
+    GfxEntry(0x6,0x41d0,  0x50, "gfx/samus/spinScrewBottom"),
+    GfxEntry(0x6,0x4220,  0x70, "gfx/samus/spinSpaceScrewTop"),
+    GfxEntry(0x6,0x4290,  0x50, "gfx/samus/spinSpaceScrewBottom"),
+    GfxEntry(0x6,0x42e0,  0x20, "gfx/samus/springBallTop"),
+    GfxEntry(0x6,0x4300,  0x20, "gfx/samus/springBallBottom"),
+    GfxEntry(0x6,0x4320, 0xB00, "gfx/samus/samusPowerSuit"),
+    GfxEntry(0x6,0x4e20, 0xB00, "gfx/samus/samusVariaSuit"),
+    GfxEntry(0x6,0x5920, 0x400, "gfx/enemies/enemiesA"),
+    GfxEntry(0x6,0x5d20, 0x400, "gfx/enemies/enemiesB"),
+    GfxEntry(0x6,0x6120, 0x400, "gfx/enemies/enemiesC"),
+    GfxEntry(0x6,0x6520, 0x400, "gfx/enemies/enemiesD"),
+    GfxEntry(0x6,0x6920, 0x400, "gfx/enemies/enemiesE"),
+    GfxEntry(0x6,0x6d20, 0x400, "gfx/enemies/enemiesF"),
+    GfxEntry(0x6,0x7120, 0x400, "gfx/enemies/arachnus"),
+    GfxEntry(0x6,0x7520, 0x400, "gfx/enemies/surfaceSPR"),
 
-for thing in gfx_list:
-    write_chr(thing)
+    GfxEntry(0x7,0x4000, 0x800, "tilesets/plantBubbles"),
+    GfxEntry(0x7,0x4800, 0x800, "tilesets/ruinsInside"),
+    GfxEntry(0x7,0x5000, 0x800, "tilesets/queenBG"),
+    GfxEntry(0x7,0x5800, 0x800, "tilesets/caveFirst"),
+    GfxEntry(0x7,0x6000, 0x800, "tilesets/surfaceBG"),
+    GfxEntry(0x7,0x6800, 0x530, "tilesets/lavaCavesA"),
+    GfxEntry(0x7,0x6d30, 0x530, "tilesets/lavaCavesB"),
+    GfxEntry(0x7,0x7260, 0x530, "tilesets/lavaCavesC"),
+    GfxEntry(0x7,0x7790, 0x2C0, "gfx/items"),
+    GfxEntry(0x7,0x7a50,  0x40, "gfx/itemOrb"),
+    GfxEntry(0x7,0x7a90, 0x100, "gfx/commonItems"),
     
+    GfxEntry(0x8,0x59bc, 0x400, "gfx/enemies/metAlpha"),
+    GfxEntry(0x8,0x5dbc, 0x400, "gfx/enemies/metGamma"),
+    GfxEntry(0x8,0x61bc, 0x400, "gfx/enemies/metZeta"),
+    GfxEntry(0x8,0x65bc, 0x400, "gfx/enemies/metOmega"),
+    GfxEntry(0x8,0x69bc, 0x800, "tilesets/ruinsExt"),
+    GfxEntry(0x8,0x71bc, 0x800, "tilesets/finalLab"),
+    GfxEntry(0x8,0x79bc, 0x500, "gfx/enemies/queenSPR"),
+]
+
+def extract():
+    rom = open("./Metroid2.gb", "rb")
+    for gfx in gfx_list:
+        rom.seek(gfx.rom_address)
+        chr = rom.read(gfx.size)
+        with open(gfx.path, "wb") as f:
+            f.write(chr)
+    rom.close()
+
+def clean():
+    for gfx in gfx_list:
+        if os.path.exists(gfx.path):
+            os.remove(gfx.path)
+
 # EoF

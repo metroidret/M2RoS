@@ -27,7 +27,7 @@ sprite_creditsSuitlessHead_frameF,SPRITE_CREDITS_SUITLESS_HEAD_6,
 sprite_creditsSuitlessHead_frameG,SPRITE_CREDITS_SUITLESS_HEAD_7,
 sprite_creditsStarSmall,SPRITE_CREDITS_STAR_SMALL,Code assumes the index of this is even to toggle between drawing small and large stars (via a bitwise AND)
 sprite_creditsStarLarge,SPRITE_CREDITS_STAR_LARGE,
-sprite_creditsUnusedThe,,The “The End” tiles are 16 tiles later outside the OAM range.
+sprite_creditsUnusedThe,,The "The End" tiles are 16 tiles later outside the OAM range.
 sprite_creditsUnusedEnd,,"but if you switched the graphics around, the tiles would map perfectly."
 sprite_creditsSpinJump_frameA,SPRITE_CREDITS_SPINJUMP_1,
 sprite_creditsSpinJump_frameB,SPRITE_CREDITS_SPINJUMP_2,

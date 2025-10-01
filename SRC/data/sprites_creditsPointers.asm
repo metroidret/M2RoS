@@ -28,7 +28,7 @@
     dw sprite_creditsSuitlessHead_frameG ; 
     dw sprite_creditsStarSmall ; Code assumes the index of this is even to toggle between drawing small and large stars (via a bitwise AND)
     dw sprite_creditsStarLarge ; 
-    dw sprite_creditsUnusedThe ; The “The End” tiles are 16 tiles later outside the OAM range.
+    dw sprite_creditsUnusedThe ; The "The End" tiles are 16 tiles later outside the OAM range.
     dw sprite_creditsUnusedEnd ; but if you switched the graphics around, the tiles would map perfectly.
     dw sprite_creditsSpinJump_frameA ; 
     dw sprite_creditsSpinJump_frameB ; 
