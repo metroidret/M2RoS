@@ -2777,7 +2777,7 @@ ret
     db $00, $80
 ; Enemy headers for projectiles
 .blobHeader_A: ; 02:50D5
-    db $9E, $00, $00, $00, $00, $00,
+    db $9E, $00, $00, $00, $00, $00
     dw blobMovementTable_A
     db $00, $02, $02
     dw enAI_blobProjectile

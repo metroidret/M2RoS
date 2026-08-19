@@ -72,7 +72,7 @@ unknown_C227: ds 1 ; $C227 - Unknown
 section "WRAM Bank 0 - C300", wram0[$C300] ;{
 ; Note: This entire page ($C300..$C3FF) is initialized to $00 by the Queen)
 
-oamScratchpad: ds $60 ; $C300..3D: Used for compositing dynamic sprites
+oamScratchpad: ds $18 * OBJ_SIZE ; $C300..5F: Used for compositing dynamic sprites
 
 def enSprite_blobThrower = oamScratchpad ; Uses $40 bytes
 
@@ -85,7 +85,7 @@ def queen_wallOAM_body = queen_wallOAM ; $C338 - Queen Wall OAM (body portion) -
 def queen_wallOAM_head = queen_wallOAM + 4*$07 ; $C354 - Queen Wall OAM (head portion) - 5 slots
 
 ; Queen OAM overwrites this
-hitboxC360: ds 4 ; $C360..$C363 - Blob Thrower hitbox
+hitboxC360: ds OBJ_SIZE ; $C360..$C363 - Blob Thrower hitbox
 
 section "Special Enemy Variables", wram0[$C380]
 

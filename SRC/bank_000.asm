@@ -3002,7 +3002,7 @@ poseFunc_morphFall: ;{ 00:123B - $08: Morphball falling
         bit itemBit_spider, a
         jr z, .endIf_E
             ld a, [camera_speedLeft]
-    .endIf_E
+    .endIf_E:
 
 .moveVertical:
     ; Move vertically according to the value in the fallArcTable
@@ -3925,7 +3925,7 @@ poseFunc_jump: ;{ 00:17BB - Pose $01
         and a
             jr nz, .startFalling ; Note: acidContactFlag is never set at this point in the main loop, so this jump appears to be thankfully never taken.
         ld a, [hl]
-    .endIf_C
+    .endIf_C:
 
 .moveVertical:
     call samus_moveVertical
@@ -5482,7 +5482,7 @@ samus_getTileIndex: ;{ 00:1FF5
 ret
 ;}
 
-metroidLCounterTable: ;{ 0:203B - Metroids remaining (L counter) - Value is BCD
+metroidLCounterTable: ;{ 00:203B - Metroids remaining (L counter) - Value is BCD
     db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $00, $00, $00, $00, $00, $00
     db $01, $02, $03, $01, $01, $01, $02, $03, $04, $05, $00, $00, $00, $00, $00, $00
     db $06, $07, $01, $02, $01, $01, $02, $03, $04, $05, $00, $00, $00, $00, $00, $00
@@ -10393,23 +10393,17 @@ ret ;}
 earthquakeCheck_farCall: ; 00:3C92
     callFar earthquakeCheck
     ; Return to callee
-    ld a, $02 ; All callees are Metroid AI routines
-    ld [bankRegMirror], a
-    ld [rMBC_BANK_REG], a
+    switchBankVar $02 ; All callees are Metroid AI routines
 ret
 
 enemy_deleteSelf_farCall: ; 00:3CA6 - enemy routine: Delete self?
     callFar enemy_deleteSelf
-    ld a, $02 ; Enemy AI bank
-    ld [bankRegMirror], a
-    ld [rMBC_BANK_REG], a
+    switchBankVar $02 ; Enemy AI bank
 ret
 
 enemy_seekSamus_farCall: ; 00:3CBA
     callFar enemy_seekSamus
-    ld a, $02 ; Callees are metroids
-    ld [bankRegMirror], a
-    ld [rMBC_BANK_REG], a
+    switchBankVar $02 ; Callees are metroids
 ret
 
 destroyBlock_farCall: ; 00:3CCE

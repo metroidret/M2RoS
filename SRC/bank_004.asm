@@ -1031,7 +1031,7 @@ initializeAudio:
         cp $d0 ; $D000 / 10h
     jr nz, .loop
 
-.ret
+.ret:
 ret
 ;}
 
@@ -5683,14 +5683,6 @@ waveSfx_playback_5:
 
 optionSets_wave:
 ;{
-macro WaveOptionSet ; [volume], [frequency]
-    static_assert \1 < 4, "Invalid volume"
-    static_assert \2 < $800, "Invalid frequency"
-    
-    db $80, $00, \1 << 5
-    dw \2 | $8000
-endm
-
 .healthUnder20_0: ; $5EFF
     WaveOptionSet 1, $4F0
 
