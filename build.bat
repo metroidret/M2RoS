@@ -40,8 +40,8 @@ if errorlevel 1 goto errorLINK
 echo.  Success
 echo. 
 
-echo. Fixing header
-rgbfix -v out/M2RoS.gb
+echo. Writing header
+rgbfix -v -t METROID2 -l 0x01 -m MBC1+RAM+BATTERY -r 0x02 -p 0x00 -j out/M2RoS.gb
 if errorlevel 1 goto errorFIX
 echo.  Done
 echo.

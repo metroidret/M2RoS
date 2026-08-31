@@ -1245,7 +1245,7 @@ unused_setXFlip: ;{ 02:45FA - Unreferenced
         ld [hl], $00
         ret
     .else:
-        ld [hl], OAMF_XFLIP
+        ld [hl], OAM_XFLIP
         ret
 ;} end proc
 
@@ -2777,7 +2777,7 @@ ret
     db $00, $80
 ; Enemy headers for projectiles
 .blobHeader_A: ; 02:50D5
-    db $9E, $00, $00, $00, $00, $00,
+    db $9E, $00, $00, $00, $00, $00
     dw blobMovementTable_A
     db $00, $02, $02
     dw enAI_blobProjectile
@@ -2996,7 +2996,7 @@ ret
     .endIf_G:
 
     ld a, [hInputPressed]
-    and PADF_B
+    and PAD_B
     jr nz, .else_H
         call .faceSamus
         ld a, [arachnus_actionTimer]
@@ -3077,7 +3077,7 @@ ret
 .faceSamus: ; 02:529A
     call enAI_blobThrower.getFacingDirection
     and a
-    ld a, OAMF_XFLIP ;$20
+    ld a, OAM_XFLIP ;$20
     jr z, .endIf_K
         xor a
     .endIf_K:
@@ -3369,7 +3369,7 @@ ret
     ; Flip sprite (graphics)
     ld hl, hEnemy.attr
     ld a, [hl]
-    xor OAMF_XFLIP
+    xor OAM_XFLIP
     ld [hl], a
     ; Flip sprite (logic)
     ld hl, hEnemy.directionFlags
@@ -3399,7 +3399,7 @@ ret
     ; Flip sprite (graphics)
     ld hl, hEnemy.attr
     ld a, [hl]
-    xor OAMF_XFLIP
+    xor OAM_XFLIP
     ld [hl], a
     ; This unused branch doesn't animate the sprite
 ret
@@ -4168,7 +4168,7 @@ crawler_turn: ;{
     ; Set attributes
     ld [hl+], a
     inc l
-    ld a, OAMF_XFLIP
+    ld a, OAM_XFLIP
     ld [hl], a
 ret
 
@@ -4199,7 +4199,7 @@ jr .xFlip
     ld [hl+], a
     ; Set attributes
     inc l
-    ld a, OAMF_YFLIP
+    ld a, OAM_YFLIP
     ld [hl], a
 ret
 
@@ -4257,7 +4257,7 @@ ret
         jr z, .moveAndAnimate
     call crawler_turn.right
     ld hl, hEnemy.attr
-    set OAMB_YFLIP, [hl]
+    set B_OAM_YFLIP, [hl]
 ret
 
 .insideCornerCheck_topRight: ; Right
@@ -4267,7 +4267,7 @@ ret
         jr z, .moveAndAnimate
     call crawler_turn.down
     ld hl, hEnemy.attr
-    res OAMB_XFLIP, [hl]
+    res B_OAM_XFLIP, [hl]
 ret
 
 .insideCornerCheck_bottomRight: ; Down
@@ -4277,7 +4277,7 @@ ret
         jr z, .moveAndAnimate
     call crawler_turn.left
     ld hl, hEnemy.attr
-    res OAMB_YFLIP, [hl]
+    res B_OAM_YFLIP, [hl]
 ret
 
 .insideCornerCheck_bottomLeft: ; Left
@@ -4287,7 +4287,7 @@ ret
         jr z, .moveAndAnimate
     call crawler_turn.up
     ld hl, hEnemy.attr
-    set OAMB_XFLIP, [hl]
+    set B_OAM_XFLIP, [hl]
 ret
 ; end concave checks
 
@@ -4309,7 +4309,7 @@ ret
         jp nz, .gotoConcaveChecks
     call crawler_turn.left
     ld hl, hEnemy.attr
-    res OAMB_YFLIP, [hl]
+    res B_OAM_YFLIP, [hl]
 ret
 
 .outsideCornerCheck_bottomRight: ; Right
@@ -4319,7 +4319,7 @@ ret
         jp nz, .gotoConcaveChecks
     call crawler_turn.up
     ld hl, hEnemy.attr
-    set OAMB_XFLIP, [hl]
+    set B_OAM_XFLIP, [hl]
 ret
 
 .outsideCornerCheck_bottomLeft: ; Down
@@ -4329,7 +4329,7 @@ ret
         jp nz, .gotoConcaveChecks
     call crawler_turn.right
     ld hl, hEnemy.attr
-    set OAMB_YFLIP, [hl]
+    set B_OAM_YFLIP, [hl]
 ret
 
 .outsideCornerCheck_topLeft: ; Left
@@ -4339,7 +4339,7 @@ ret
         jp nz, .gotoConcaveChecks
     call crawler_turn.down
     ld hl, hEnemy.attr
-    res OAMB_XFLIP, [hl]
+    res B_OAM_XFLIP, [hl]
 ret
 ;}
 
@@ -4354,7 +4354,7 @@ skreek_projectileCode: ;{ 02:59A6
         ld hl, hEnemy.xPos
         ld b, $02 ; Load speed
         ldh a, [hEnemy.attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_B
             ; Move left
             ld a, [hl]
@@ -4411,7 +4411,7 @@ enAI_skreek: ;{ 02:59C7
         ; Face left
         cpl
         inc a
-        ld c, OAMF_XFLIP
+        ld c, OAM_XFLIP
     .endIf_A:
     ; Also, only act if Samus is in range
     cp $30
@@ -4495,7 +4495,7 @@ ret
         ; Check attribute to set x pos
         ldh a, [hEnemy.attr]
         ld b, a
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_D
             ; Left side
             ldh a, [hEnemy.xPos]
@@ -4584,7 +4584,7 @@ ret
     ; Move according to direction
     ld hl, hEnemy.xPos
     ldh a, [hEnemy.attr]
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
         jr nz, .moveRight
     
     ; Move Left
@@ -5007,7 +5007,7 @@ ret
         ; Senjoo animation
         ld hl, hEnemy.attr
         ld a, [hl]
-        xor OAMF_XFLIP
+        xor OAM_XFLIP
         ld [hl], a
         ret
     .endIf_B:
@@ -5223,7 +5223,7 @@ ret
         ldh [hEnemy.generalVar], a
         ; Flip the sprite horizontally
         ldh a, [hEnemy.attr]
-        xor OAMF_XFLIP
+        xor OAM_XFLIP
         ldh [hEnemy.attr], a
             jr .moveDown
     
@@ -5242,7 +5242,7 @@ ret
         ldh [hEnemy.generalVar], a
         ; Flip the sprite horizontally
         ldh a, [hEnemy.attr]
-        xor OAMF_XFLIP
+        xor OAM_XFLIP
         ldh [hEnemy.attr], a
 
 .moveDown:
@@ -5455,7 +5455,7 @@ ret
         ldh [hEnemy.attr], a
         jr .endIf_F
     .else_F:
-        ld a, OAMF_XFLIP
+        ld a, OAM_XFLIP
         ldh [hEnemy.attr], a
     .endIf_F:
     ; Increment to the next state
@@ -5578,7 +5578,7 @@ enAI_skorpVert: ;{ 02:60AB
         ; Extend based on direction in header
         ld hl, hEnemy.yPos
         ldh a, [hEnemy.attr]
-        bit OAMB_YFLIP, a
+        bit B_OAM_YFLIP, a
         jr nz, .else_A
             dec [hl]
             ret
@@ -5612,7 +5612,7 @@ enAI_skorpVert: ;{ 02:60AB
     ; Retract based on direction in header
     ld hl, hEnemy.yPos
     ldh a, [hEnemy.attr]
-    bit OAMB_YFLIP, a
+    bit B_OAM_YFLIP, a
     jr nz, .else_B
         inc [hl]
         ret
@@ -5658,7 +5658,7 @@ enAI_skorpHori: ;{ 02:60F8
         ; Extend based on direction in header
         ld hl, hEnemy.xPos
         ldh a, [hEnemy.attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr z, .else_A
             dec [hl]
             ret
@@ -5693,7 +5693,7 @@ enAI_skorpHori: ;{ 02:60F8
     ; Retract based on direction in header
     ld hl, hEnemy.xPos
     ldh a, [hEnemy.attr]
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr z, .else_B
         inc [hl]
         ret
@@ -5766,7 +5766,7 @@ enAI_autrack: ;{ 02:6145
     ; Adjust spawn location of laser depending on direction facing
     ldh a, [hEnemy.attr]
     ld b, a
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_C
         ldh a, [hEnemy.xPos]
         sub $08
@@ -5820,7 +5820,7 @@ ret
 .laser: ; Laser AI
     ld hl, hEnemy.xPos
     ldh a, [hEnemy.attr]
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .moveLeft
     ; move left
         ld a, [hl]
@@ -6066,7 +6066,7 @@ ret
     ; Set x position depending on facing direction
     ldh a, [hEnemy.attr]
     ld b, a
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_B
         ldh a, [hEnemy.xPos]
         add $08
@@ -6122,7 +6122,7 @@ ret
     ld hl, hEnemy.xPos
     ; Check direction
     ldh a, [hEnemy.attr]
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_C
         ; Move right
         ld a, [hl]
@@ -6877,32 +6877,32 @@ ret
     ld a, [hl]
     and a
         jr z, .setYFlip
-    cp OAMF_XFLIP
+    cp OAM_XFLIP
         jr z, .setNoFlip
-    cp OAMF_YFLIP
+    cp OAM_YFLIP
         jr z, .setXYFlip
     ; continue to .setXFlip
 
 .setXFlip:
-    ld [hl], OAMF_XFLIP
+    ld [hl], OAM_XFLIP
     ret
 .setNoFlip:
     ld [hl], $00
     ret
 .setYFlip:
-    ld [hl], OAMF_YFLIP
+    ld [hl], OAM_YFLIP
     ret
 .setXYFlip:
-    ld [hl], OAMF_XFLIP | OAMF_YFLIP
+    ld [hl], OAM_XFLIP | OAM_YFLIP
     ret
 
 .animate_ccw:
     ld a, [hl]
     and a
         jr z, .setXFlip
-    cp OAMF_XFLIP
+    cp OAM_XFLIP
         jr z, .setXYFlip
-    cp OAMF_YFLIP
+    cp OAM_YFLIP
         jr z, .setNoFlip
     jr .setYFlip
 ;} end proc
@@ -6937,7 +6937,7 @@ enAI_moto: ;{ 02:66F3
     ; Flip enemy (visually)
     ld hl, hEnemy.attr
     ld a, [hl]
-    xor OAMF_XFLIP
+    xor OAM_XFLIP
     ld [hl], a
     ; Flip enemy (logically)
     ld hl, hEnemy.directionFlags
@@ -7870,7 +7870,7 @@ enemy_flipHorizontal: ;{ Procedure has 3 entry points
 .now: ; 02:6B62
     ld hl, hEnemy.attr
     ld a, [hl]
-    xor OAMF_XFLIP
+    xor OAM_XFLIP
     ld [hl], a
 ret
 ;}
@@ -7890,7 +7890,7 @@ enemy_flipVertical: ;{ Procedure has 3 entry points
 .now: ; 02:6B7B - Never called directly
     ld hl, hEnemy.attr
     ld a, [hl]
-    xor OAMF_YFLIP
+    xor OAM_YFLIP
     ld [hl], a
 ret
 ;}
@@ -8120,7 +8120,7 @@ ret
         ld a, [samus_onscreenXPos]
         sub b
         jr c, .else_D
-            ld a, OAMF_XFLIP
+            ld a, OAM_XFLIP
             ldh [hEnemy.attr], a
             jr .endIf_C
         .else_D:
@@ -8941,7 +8941,7 @@ ret
         ld a, [samus_onscreenXPos]
         sub b
         jr c, .else_I
-            ld a, OAMF_XFLIP
+            ld a, OAM_XFLIP
             ldh [hEnemy.attr], a
             jr .endIf_H
         .else_I:
@@ -8970,7 +8970,7 @@ ret
         ld [hl+], a
         ldh a, [hEnemy.attr]
         ; Adjust attack xpos based on facing direction
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_K
             ldh a, [hEnemy.xPos]
             sub $08
@@ -9013,13 +9013,13 @@ ret
     jr z, .else_L
         dec [hl]
         ldh a, [hEnemy.attr]
-        set OAMB_YFLIP, a
+        set B_OAM_YFLIP, a
         ldh [hEnemy.attr], a
         ldh a, [hEnemy.yPos]
         sub $0d
         ldh [hEnemy.yPos], a
         ldh a, [hEnemy.attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_M
             ldh a, [hEnemy.xPos]
             add $04
@@ -9032,14 +9032,14 @@ ret
             ret
     .else_L:
         ldh a, [hEnemy.attr]
-        bit OAMB_YFLIP, a
+        bit B_OAM_YFLIP, a
         jr nz, .else_N
             inc [hl]
             ldh a, [hEnemy.yPos]
             sub $10
             ldh [hEnemy.yPos], a
             ldh a, [hEnemy.attr]
-            bit OAMB_XFLIP, a
+            bit B_OAM_XFLIP, a
             jr nz, .else_O
                 ldh a, [hEnemy.xPos]
                 sub $04
@@ -9313,7 +9313,7 @@ jr .standardAction
             ld a, $01
             ld [zeta_xProximityFlag], a
         .endIf_E:
-        ld a, OAMF_XFLIP
+        ld a, OAM_XFLIP
         ldh [hEnemy.attr], a
         jr .endIf_D
     .else_D:
@@ -9520,7 +9520,7 @@ ret
             ld [hl+], a
             ; Move
             ldh a, [hEnemy.attr]
-            bit OAMB_XFLIP, a
+            bit B_OAM_XFLIP, a
             jr nz, .else_L
                 dec [hl]
                 ret
@@ -9545,7 +9545,7 @@ ret
     jr c, .else_M
         ; Move forward
         ldh a, [hEnemy.attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_N
             dec [hl]
             ret
@@ -9691,7 +9691,7 @@ ret
     ld [hl+], a
     ldh a, [hEnemy.attr]
     ld b, a
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_Q
         ldh a, [hEnemy.xPos]
         sub $18
@@ -9862,7 +9862,7 @@ ret
         jr z, .plink
     ; Check if hit from front or behind
     ldh a, [hEnemy.attr]
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_A
         bit 1, b
             jr z, .hurtOneDamage
@@ -10088,7 +10088,7 @@ ret
     jr c, .else_E
         cp $10
         jr c, .endIf_E
-            ld a, OAMF_XFLIP
+            ld a, OAM_XFLIP
             ldh [hEnemy.attr], a
             jr .endIf_E
     .else_E:
@@ -10120,7 +10120,7 @@ ret
     jr c, .else_F
         ; Move forwards
         ldh a, [hEnemy.attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr nz, .else_G
             dec [hl]
             dec [hl]
@@ -10318,7 +10318,7 @@ ret
     ld [hl+], a
     ldh a, [hEnemy.attr]
     ld b, a
-    bit OAMB_XFLIP, a
+    bit B_OAM_XFLIP, a
     jr nz, .else_N
         ldh a, [hEnemy.xPos]
         sub $10
@@ -10517,7 +10517,7 @@ ret
         xor a
         jr .endIf_Q
     .else_Q:
-        ld a, OAMF_XFLIP
+        ld a, OAM_XFLIP
     .endIf_Q:
     ldh [hEnemy.attr], a
 ; fallthrough to next proc (!)

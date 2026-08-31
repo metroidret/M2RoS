@@ -57,7 +57,7 @@ out/game.o: SRC/game.asm out $(ENEMY_SCRIPT_OUT) $(SAMUS_SCRIPT_OUT) $(GENERAL_S
 
 out/M2RoS.gb: out/game.o
 	rgblink -n out/M2RoS.sym -m out/M2RoS.map -o $@ $<
-	rgbfix -v $@
+	rgbfix -v -t METROID2 -l 0x01 -m MBC1+RAM+BATTERY -r 0x02 -p 0x00 -j $@
 
 	md5sum $@
 	diff --brief $@ Metroid2.gb

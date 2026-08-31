@@ -156,7 +156,7 @@ loadTitleScreen: ;{ 05:408F
         dec b
     jr nz, .saveTextLoop
     ; Load title tilemap
-    ld de, _SCRN0
+    ld de, TILEMAP0
     ld hl, titleTilemap
     .titleTilemapLoop:
         ld a, [hl+]
@@ -349,7 +349,7 @@ titleScreenRoutine: ;{ 05:4118
 ;{ Title input logic
     ; Toggle clear option when select is pressed
     ldh a, [hInputRisingEdge]
-    cp PADF_SELECT
+    cp PAD_SELECT
     jr nz, .endIf_F
         ; Play sound effect
         ld a, sfx_square1_select
@@ -362,10 +362,10 @@ titleScreenRoutine: ;{ 05:4118
     
     ; If right is pressed, increment save slot
     ldh a, [hInputRisingEdge]
-    cp PADF_RIGHT
+    cp PAD_RIGHT
     jr nz, .endIf_G
         ldh a, [hInputPressed]
-        cp PADF_RIGHT
+        cp PAD_RIGHT
         jr nz, .endIf_G
             ; Play sound effect
             ld a, sfx_square1_select
@@ -383,10 +383,10 @@ titleScreenRoutine: ;{ 05:4118
 
     ; If left is pressed, decrement save slot
     ldh a, [hInputRisingEdge]
-    cp PADF_LEFT
+    cp PAD_LEFT
     jr nz, .endIf_H
         ldh a, [hInputPressed]
-        cp PADF_LEFT
+        cp PAD_LEFT
         jr nz, .endIf_H
             ; Play sound effect
             ld a, sfx_square1_select
@@ -411,14 +411,14 @@ titleScreenRoutine: ;{ 05:4118
     jr z, .endIf_I
         ; Check if down is pressed
         ldh a, [hInputPressed]
-        bit PADB_DOWN, a
+        bit B_PAD_DOWN, a
         jr z, .endIf_I
             ; Set flag
             ld a, $01
             ld [title_clearSelected], a
             ; Check edge of input
             ldh a, [hInputRisingEdge]
-            bit PADB_DOWN, a
+            bit B_PAD_DOWN, a
             jr z, .endIf_I
                 ; Play sound effect
                 ld a, sfx_square1_select
@@ -427,7 +427,7 @@ titleScreenRoutine: ;{ 05:4118
 
     ; Exit title routine if start is not pressed
     ldh a, [hInputRisingEdge]
-    cp PADF_START
+    cp PAD_START
         ret nz
 ;} End of title input logic
 
@@ -570,7 +570,7 @@ title_clearUnusedOamSlots: ;{ 05:42D4
         xor a
         ld [hl+], a
         ld a, l
-        cp OAM_MAX
+        cp OAM_SIZE
     jr c, .clearLoop
 ret
 ;}
@@ -1366,7 +1366,7 @@ ret
     ldh [hSpriteId], a
     call drawNonGameSprite_longCall
     ; Flip bottom, adjust position
-    ld a, OAMF_XFLIP
+    ld a, OAM_XFLIP
     ldh [hSpriteAttr], a
     ldh a, [hSpriteXPixel]
     dec a
@@ -1384,7 +1384,7 @@ ret
     ldh [hSpriteId], a
     call drawNonGameSprite_longCall
     ; Flip bottom
-    ld a, OAMF_XFLIP
+    ld a, OAM_XFLIP
     ldh [hSpriteAttr], a
     ld a, SPRITE_CREDITS_SUITED_RUNNING_BOTTOM_2 ;$0c
     ldh [hSpriteId], a

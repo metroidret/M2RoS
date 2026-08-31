@@ -106,6 +106,14 @@ macro WaveOptions ; [wave pattern data pointer], [volume], [unused]
     db \2 << 5 | \3
 endm
 
+macro WaveOptionSet ; [volume], [frequency]
+    static_assert \1 < 4, "Invalid volume"
+    static_assert \2 < $800, "Invalid frequency"
+    
+    db $80, $00, \1 << 5
+    dw \2 | $8000
+endm
+
 macro SongHeader ; [music note offset], [tempo table pointer], [tone/sweep channel pointer], [tone channel pointer], [wave channel pointer], [noise channel pointer]
     static_assert \1 < $100, "Invalid music note offset"
     static_assert \2 < $10000, "Invalid tempo table pointer"

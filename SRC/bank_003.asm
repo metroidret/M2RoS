@@ -38,7 +38,7 @@ loadEnemies: ;{ 03:4014
     ld h, a
     push hl
         ; Get bottom edge of the visible screen, rounded to the nearest block
-        ld bc, SCRN_Y/2 + $10 + OAM_Y_OFS ;$0068
+        ld bc, SCREEN_HEIGHT_PX/2 + $10 + OAM_Y_OFS ;$0068
         add hl, bc
         ld a, l
         and $100 - OAM_Y_OFS
@@ -47,7 +47,7 @@ loadEnemies: ;{ 03:4014
         ld [bottomEdge_screen], a
     pop hl
     ; Get top edge of visible screen, rounded to the nearest block
-    ld bc, -SCRN_Y/2 - $10 ;$ffa8
+    ld bc, -SCREEN_HEIGHT_PX/2 - $10 ;$ffa8
     add hl, bc
     ld a, l
     and $100 - OAM_Y_OFS
@@ -65,7 +65,7 @@ loadEnemies: ;{ 03:4014
     ld h, a
     push hl
         ; Get right edge of the visible screen, rounded to the nearest tile
-        ld bc, SCRN_X/2 + $10 + OAM_X_OFS ;$0068
+        ld bc, SCREEN_WIDTH_PX/2 + $10 + OAM_X_OFS ;$0068
         add hl, bc
         ld a, l
         and $100 - OAM_X_OFS
@@ -74,7 +74,7 @@ loadEnemies: ;{ 03:4014
         ld [rightEdge_screen], a
     pop hl
     ; Get left edge of the visible screen, rounded to the nearest tile
-    ld bc, -SCRN_X/2 - $10 ;$ffa0
+    ld bc, -SCREEN_WIDTH_PX/2 - $10 ;$ffa0
     add hl, bc
     ld a, l
     and $100 - OAM_X_OFS
@@ -1079,7 +1079,7 @@ queen_initialize: ;{ 03:6D4A
     ld [queen_bodyHeight], a
     
     ; Enable interrupt
-    ld a, STATF_LYC | STATF_LYCF ; $44
+    ld a, STAT_LYC | STAT_LYCF ; $44
     ld [rSTAT], a
     
     ; Set initial position values
@@ -2043,7 +2043,7 @@ queen_drawNeck: ;{ 03:7230
         ld [hl], $b5
         ; Write attributes
         inc l
-        ld [hl], OAMF_PRI ; $80
+        ld [hl], OAM_PRIO ; $80
         
         ; Render second neck sprite
         ; Write Y position
@@ -2058,7 +2058,7 @@ queen_drawNeck: ;{ 03:7230
         ld [hl], $c5
         ; Write attributes
         inc l
-        ld [hl], OAMF_PRI ; $80
+        ld [hl], OAM_PRIO ; $80
     pop hl
     ; Save the scratchpad pointer at the beginning of the latest sprite-pair
     
@@ -2844,7 +2844,7 @@ queen_drawOneProjectileMetasprite: ;{ 03:762D
     ; Set tile number
     ld d, $f1
     ; Set attribute
-    ld e, OAMF_PRI | OAMF_YFLIP ; $c0
+    ld e, OAM_PRIO | OAM_YFLIP ; $c0
     call queen_drawOneProjectileSprite
     
     ; Subtract 8 from Y position
@@ -2852,7 +2852,7 @@ queen_drawOneProjectileMetasprite: ;{ 03:762D
     add b
     ld b, a
     ; Set attribute
-    ld e, OAMF_PRI ; $80
+    ld e, OAM_PRIO ; $80
     call queen_drawOneProjectileSprite
     
     ; Subtract 8 from X position
@@ -2868,7 +2868,7 @@ queen_drawOneProjectileMetasprite: ;{ 03:762D
     add b
     ld b, a
     ; Set attribute
-    ld e, OAMF_PRI | OAMF_YFLIP ; $C0
+    ld e, OAM_PRIO | OAM_YFLIP ; $C0
     call queen_drawOneProjectileSprite
 ret ;}
 
@@ -3297,7 +3297,7 @@ queen_setDefaultNeckAttributes: ;{ 03:7812
         inc l
         inc l
         ; Write priority
-        ld a, OAMF_PRI ;$80
+        ld a, OAM_PRIO ;$80
         ld [hl+], a
         ; Loop until it's done
         dec b
@@ -3773,12 +3773,12 @@ queen_killFromStomach: ;{ 03:7A4D Kill Queen from stomach
     inc l
     inc l
     inc l
-    ld [hl], OAMF_PRI ;$80
+    ld [hl], OAM_PRIO ;$80
     inc l
     inc l
     inc l
     inc l
-    ld [hl], OAMF_PRI ;$80
+    ld [hl], OAM_PRIO ;$80
     
     ; Close the exit
     call queen_closeFloor
@@ -4246,9 +4246,9 @@ VBlank_drawQueen: ;{ 03:7CF0
     ld a, [queen_headY]
     ld [rWY], a
     add queenInRoom_headHeight
-    cp SCRN_Y
+    cp SCREEN_HEIGHT_PX
     jr c, .endIf_B
-        ld a, SCRN_Y-1
+        ld a, SCREEN_HEIGHT_PX-1
     .endIf_B:
     ld [queen_headBottomY], a
     
@@ -4257,9 +4257,9 @@ VBlank_drawQueen: ;{ 03:7CF0
     ld b, a
     ld a, [queen_bodyHeight]
     add b
-    cp SCRN_Y
+    cp SCREEN_HEIGHT_PX
     jr c, .endIf_C
-        ld a, SCRN_Y-1
+        ld a, SCREEN_HEIGHT_PX-1
     .endIf_C:
     ld d, a
     

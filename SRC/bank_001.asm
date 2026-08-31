@@ -492,7 +492,7 @@ drawSamusSprite: ;{ 01:4B62
         and a
         jr z, .else_A
             ld a, [de]
-            set OAMB_PAL1, a
+            set B_OAM_PAL1, a
             jr .endIf_A
         .else_A:
             ld a, [de]
@@ -504,7 +504,7 @@ drawSamusSprite: ;{ 01:4B62
         and a
         jr nz, .endIf_B
             ld a, [hl]
-            set OAMB_PRI, a
+            set B_OAM_PRIO, a
             ld [hl], a
         .endIf_B:
         
@@ -550,7 +550,7 @@ clearAllOam: ;{ 00:4BCE
         xor a
         ld [hl+], a
         ld a, l
-        cp OAM_MAX
+        cp OAM_SIZE
     jr c, .clearLoop
 ret ;}
 
@@ -606,7 +606,7 @@ drawSamus: ;{ 01:4BD9 Draw Samus
     .else_D:
         ; Load input into temp variable
         ldh a, [hInputPressed]
-        and PADF_DOWN | PADF_UP | PADF_LEFT | PADF_RIGHT ;$f0
+        and PAD_CTRL_PAD ;$f0
         swap a ; Swap nybbles for array-indexing purposes
         ; OR the dummy input into the temp variable as well
         or b
@@ -911,13 +911,13 @@ drawSamus_run: ;{ 01:4D77 - $03: Running
     ; Get base address of table
     ld hl, .runningTableNormal
     ldh a, [hInputPressed]
-    bit PADB_UP, a
+    bit B_PAD_UP, a
     jr z, .else_C
         ld hl, .runningTableAimingUp
         jr .endIf_C
     .else_C:
         ldh a, [hInputPressed]
-        bit PADB_B, a
+        bit B_PAD_B, a
         jr z, .endIf_C
             ld hl, .runningTableShooting
     .endIf_C:
@@ -974,7 +974,7 @@ drawSamus_common: ;{ 01:4DDF
     ld b, a
     ldh a, [hSamusXPixel]
     sub b
-    add SCRN_X / 2 + OAM_X_OFS + samusOriginX_toCenter
+    add SCREEN_WIDTH_PX / 2 + OAM_X_OFS + samusOriginX_toCenter
     ldh [hSpriteXPixel], a
     ld [samus_onscreenXPos], a
     ; Set y pos
@@ -982,7 +982,7 @@ drawSamus_common: ;{ 01:4DDF
     ld b, a
     ldh a, [hSamusYPixel]
     sub b
-    add SCRN_Y / 2 + OAM_Y_OFS + samusOriginY_toCenter
+    add SCREEN_HEIGHT_PX / 2 + OAM_Y_OFS + samusOriginY_toCenter
     ldh [hSpriteYPixel], a
     ld [samus_onscreenYPos], a
 
@@ -1090,11 +1090,11 @@ include "data/initialSave.asm"
 samusShoot: ;{ 01:4E8A
     ; Fire if the B button was just pressed
     ldh a, [hInputRisingEdge]
-    bit PADB_B, a
+    bit B_PAD_B, a
     jr nz, .endIf_A
         ; Or, check if the B button is being held
         ldh a, [hInputPressed]
-        bit PADB_B, a
+        bit B_PAD_B, a
             ret z
         ; Increment the cooldown counter
         ld a, [samusBeamCooldown]
@@ -2153,7 +2153,7 @@ samus_layBomb: ;{ 01:53D9 - Lay bombs
     
     ; Exit if B was not just pressed
     ldh a, [hInputRisingEdge]
-    bit PADB_B, a
+    bit B_PAD_B, a
         ret z
     
     ; Find first open bomb slot (if available)
@@ -2993,7 +2993,7 @@ miscIngameTasks: ;{ 01:57F2
             jr nz, .endIf_E
                 ; Check input
                 ldh a, [hInputRisingEdge]
-                cp PADF_START
+                cp PAD_START
                 jr nz, .endIf_E
                     ; Save!
                     ld a, $09
@@ -3195,7 +3195,7 @@ drawEnemySprite: ;{ 01:5A3F
     ; Load sprite Y position
         ; Check if vertically flipped
         ld a, [drawEnemy_attr]
-        bit OAMB_YFLIP, a
+        bit B_OAM_YFLIP, a
         jr z, .else_A
             ; Flip vertically
             ld a, [de]
@@ -3213,7 +3213,7 @@ drawEnemySprite: ;{ 01:5A3F
         ; Check if horizontally flipped
         inc de
         ld a, [drawEnemy_attr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr z, .else_B
             ; Flip horizontally
             ld a, [de]
@@ -3968,7 +3968,7 @@ drawNonGameSprite: ;{ 01:73F7
             jr z, .exit
         ; Handle y flipping
         ldh a, [hSpriteAttr]
-        bit OAMB_YFLIP, a
+        bit B_OAM_YFLIP, a
         jr z, .else_A
             ; Flip vertically
             ld a, [de]
@@ -3985,7 +3985,7 @@ drawNonGameSprite: ;{ 01:73F7
         ; Load x coordinate
         inc de
         ldh a, [hSpriteAttr]
-        bit OAMB_XFLIP, a
+        bit B_OAM_XFLIP, a
         jr z, .else_B
             ; Flip horizontally
             ld a, [de]
